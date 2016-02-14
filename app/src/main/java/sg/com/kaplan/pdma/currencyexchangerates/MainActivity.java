@@ -34,7 +34,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        final TextView textView = (TextView) findViewById(R.id.textView);
+        final TextView textViewRates = (TextView) findViewById(R.id.textViewRates);
+        final TextView textViewBaseCurrency = (TextView) findViewById(R.id.textViewBaseCurrency);
         final ProgressBar progressBar = (ProgressBar) findViewById(R.id.progressBar);
 
         //http://developer.android.com/training/volley/request.html
@@ -43,11 +44,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onResponse(JSONObject response) {
                 progressBar.setVisibility(View.GONE);
-                textView.setText("Response: " + response.toString());
+                //textViewRates.setText("Response: " + response.toString());
 
                 //process response
                 try {
                     String base = response.getString("base");
+                    textViewBaseCurrency.setText("Base currency: " + base);
+                    textViewBaseCurrency.setVisibility(View.VISIBLE);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -61,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
                         String currency =  keys.next();
                         sb.append(currency.toString()+ " : " + rates.getDouble(currency) + "\n");
                     }
-                    textView.setText(sb.toString());
+                    textViewRates.setText(sb.toString());
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -72,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
             public void onErrorResponse(VolleyError error) {
                 progressBar.setVisibility(View.GONE);
                 //Toast.makeText(getApplicationContext(), error.toString(), Toast.LENGTH_SHORT).show();
-                textView.setText("Error: " + error.toString());
+                textViewRates.setText("Error: " + error.toString());
             }
         });
 
