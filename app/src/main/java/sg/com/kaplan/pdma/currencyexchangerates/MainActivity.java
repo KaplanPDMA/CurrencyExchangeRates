@@ -1,16 +1,10 @@
 package sg.com.kaplan.pdma.currencyexchangerates;
 
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.widget.ListView;
 import android.widget.ProgressBar;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
@@ -18,10 +12,10 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 
 
@@ -34,8 +28,19 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        final TextView textViewRates = (TextView) findViewById(R.id.textViewRates);
-        final TextView textViewBaseCurrency = (TextView) findViewById(R.id.textViewBaseCurrency);
+        // Construct the data source
+        final ArrayList<Currency> currencies = new ArrayList<Currency>();
+
+        // Create the adapter to convert the array to views
+        CurrencyAdapter adapter = new CurrencyAdapter(this, currencies);
+
+        // Attach the adapter to a ListView
+        ListView listView = (ListView) findViewById(R.id.listView);
+        listView.setAdapter(adapter);
+
+
+//        final TextView textViewRates = (TextView) findViewById(R.id.textViewRates);
+//        final TextView textViewBaseCurrency = (TextView) findViewById(R.id.textViewBaseCurrency);
         final ProgressBar progressBar = (ProgressBar) findViewById(R.id.progressBar);
 
         //http://developer.android.com/training/volley/request.html
@@ -49,8 +54,8 @@ public class MainActivity extends AppCompatActivity {
                 //process response
                 try {
                     String base = response.getString("base");
-                    textViewBaseCurrency.setText("Base currency: " + base);
-                    textViewBaseCurrency.setVisibility(View.VISIBLE);
+//                    textViewBaseCurrency.setText("Base currency: " + base);
+//                    textViewBaseCurrency.setVisibility(View.VISIBLE);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -60,11 +65,13 @@ public class MainActivity extends AppCompatActivity {
                     Iterator<String> keys = rates.keys();
 
                     StringBuilder sb = new StringBuilder();
-                    while(keys.hasNext()) {
-                        String currency =  keys.next();
-                        sb.append(currency.toString()+ " : " + rates.getDouble(currency) + "\n");
+                    while (keys.hasNext()) {
+                        String currency = keys.next();
+                        //sb.append(currency.toString() + " : " + rates.getDouble(currency) + "\n");
+                        Currency c = new Currency(currency, rates.getDouble(currency));
+                        currencies.add(c);
                     }
-                    textViewRates.setText(sb.toString());
+//                    textViewRates.setText(sb.toString());
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -75,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
             public void onErrorResponse(VolleyError error) {
                 progressBar.setVisibility(View.GONE);
                 //Toast.makeText(getApplicationContext(), error.toString(), Toast.LENGTH_SHORT).show();
-                textViewRates.setText("Error: " + error.toString());
+//                textViewRates.setText("Error: " + error.toString());
             }
         });
 
@@ -91,25 +98,5 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        // Inflate the menu; this adds items to the action bar if it is present.
-//        getMenuInflater().inflate(R.menu.menu_main, menu);
-//        return true;
-//    }
-//
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        // Handle action bar item clicks here. The action bar will
-//        // automatically handle clicks on the Home/Up button, so long
-//        // as you specify a parent activity in AndroidManifest.xml.
-//        int id = item.getItemId();
-//
-//        //noinspection SimplifiableIfStatement
-//        if (id == R.id.action_settings) {
-//            return true;
-//        }
-//
-//        return super.onOptionsItemSelected(item);
-//    }
+
 }
